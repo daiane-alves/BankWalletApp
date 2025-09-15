@@ -17,8 +17,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    /** ⚠️ Reseta o estado de autenticação para o inicial (usado após limpar Keychain/AsyncStorage) */
-    resetAuthState: () => initialState,
+
   },
   extraReducers: (b) => {
     b.addCase(bootstrapAuth.pending, (s) => { s.loading = true; s.error = null; });
@@ -57,5 +56,4 @@ const authSlice = createSlice({
   },
 });
 
-export const { resetAuthState } = authSlice.actions;  // ⬅️ exporta o action
 export default authSlice.reducer;

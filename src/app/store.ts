@@ -6,7 +6,7 @@ import { baseApi } from '../services/baseApi';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    [baseApi.reducerPath]: baseApi.reducer, // ⬅️ adiciona
+    [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (gDM) => gDM().concat(baseApi.middleware, appListenerMiddleware.middleware),
   devTools: true,

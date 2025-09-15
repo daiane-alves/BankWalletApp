@@ -89,18 +89,3 @@ export async function getLockUntil(): Promise<number | null> {
   return v ? Number(v) : null;
 }
 
-export async function resetAllAuth() {
-  try {
-    await Keychain.resetGenericPassword({ service: SERVICE_PIN });
-  } catch (e) {
-    try {
-      await Keychain.resetGenericPassword();
-    } catch {}
-  }
-
-  await AsyncStorage.multiRemove([
-    STORAGE_BIOMETRICS,
-    STORAGE_AUTH,
-    STORAGE_LOCK_UNTIL,
-  ]);
-}
