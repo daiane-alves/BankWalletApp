@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "start": "react-native start --reset-cache ",
     "test": "jest",
-    "mock": "json-server --watch db.json --port 3000"
+    "mock": "json-server --watch db.json --port 3000",
+    "ios:pods": "npx pod-install ios",
+    "ios:run": "npx react-native run-ios"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
