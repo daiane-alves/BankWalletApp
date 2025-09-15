@@ -1,97 +1,206 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# BankWalletApp
 
-# Getting Started
+Aplicativo **React Native** com autenticação por **biometria (fingerprint/Face ID)**, **PIN**, e módulo nativo para obter o **idioma do sistema** (Android/iOS).
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## Stack
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+* **React Native**
+* **TypeScript**
+* **React Navigation**
+* **Biometria**: `react-native-biometrics` (ou equivalente)
+* **Módulos nativos**:
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+  * Android: `LocaleModule.kt` (Kotlin)
+  * iOS: `LocaleModule.swift` + bridge `.m`
 
-```sh
-# Using npm
-npm start
+---
 
-# OR using Yarn
-yarn start
+## Pré-requisitos
+
+* **Node** LTS e **npm**/**yarn**
+* **Java 17** (JDK 17)
+* **Android Studio** (SDK + Emulador)
+* **Xcode** (13+), CocoaPods (`gem install cocoapods`)
+
+---
+
+## Configuração do ambiente
+
+### ANDROID
+
+Configure as variáveis (ajuste o caminho conforme seu SO):
+
+**macOS**
+
+```bash
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
 ```
 
-## Step 2: Build and run your app
+Crie/edite `android/local.properties` se necessário:
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```
+sdk.dir=/Users/<seu-usuario>/Library/Android/sdk
 ```
 
 ### iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+Instale as dependências nativas:
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+npx pod-install ios
 ```
 
-Then, and every time you update your native dependencies, run:
+---
 
-```sh
-bundle exec pod install
+## Instalação
+
+```bash
+npm i
+# ou
+yarn
+```
+---
+
+## Executando
+
+### Android
+
+1. Inicie um dispositivo (AVD) no Android Studio.
+2. Em um terminal:
+
+   ```bash
+   npx react-native start --reset-cache
+   ```
+3. Em outro terminal:
+
+   ```bash
+   npm run android:reinstall
+   ```
+
+### iOS
+
+1. Inicie o Metro (se não estiver rodando).
+2. Rode:
+
+   ```bash
+   npm run ios:pods
+   npm run ios:run
+   ```
+
+   > Se preferir, abra `ios/BankWalletApp.xcworkspace` no Xcode e rode (⌘R).
+
+---
+
+## Biometria
+
+### Android (emulador)
+
+* **Permissões** no `AndroidManifest.xml`:
+
+  ```xml
+  <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+  <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+  ```
+* **Cadastrar digital no AVD**:
+
+  1. Settings → **Security & privacy** → **Device unlock**.
+  2. Defina um **PIN**.
+  3. Abra **Pixel Imprint / Fingerprint** → **Add fingerprint**.
+  4. Deixe a tela “Touch the sensor” aberta e use os **três pontinhos → Fingerprint → Touch sensor** várias vezes até concluir.
+* **Testar no app**: chame o prompt biométrico e use **Touch sensor** novamente.
+
+### iOS (simulador/dispositivo)
+
+* No **simulador**, configure o idioma em *Settings → General → Language & Region*.
+* Para **Face ID**, adicione em `Info.plist`:
+
+  ```xml
+  <key>NSFaceIDUsageDescription</key>
+  <string>Usamos o Face ID para autenticar você com segurança.</string>
+  ```
+
+---
+
+## Módulo nativo — Idioma do sistema
+
+### Android
+
+Arquivo principal: `android/app/src/main/java/com/bankwalletapp/locale/LocaleModule.kt`
+Registre o pacote `LocalePackage()` no `MainApplication.kt`.
+
+Retorna a *language tag* do **idioma do sistema** (ex.: `pt-BR`), ignorando “idioma por app”:
+
+
+### iOS
+
+Arquivos:
+
+* `ios/BankWalletApp/NativeModules/Locale/LocaleModule.swift`
+* `ios/BankWalletApp/NativeModules/Locale/LocaleModule.m`
+
+> **Importante:** adicione os arquivos ao **target** do app no Xcode (File → Add Files… → marque *Add to targets*).
+
+---
+
+## Estrutura do projeto
+
+```
+/android
+/ios
+/src
+  /app
+  /features
+    /auth
+    /wallet
+  /lib
+  /navigation
+  /screens
+    BiometricLoginScreen/
+    HomeScreen/
+    PinLoginScreen/
+    SetPinScreen/
+    TransactionDetailsScreen/
+  /services
+    /locale
+      index.ts    # wrapper TS do módulo nativo de locale
+App.tsx
+index.js
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+---
 
-```sh
-# Using npm
-npm run ios
+## Troubleshooting
 
-# OR using Yarn
-yarn ios
-```
+* **`spawnSync adb ENOENT`**
+  `adb` não está no `PATH`. Instale **Platform-Tools** e exporte:
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+  ```bash
+  export ANDROID_HOME="$HOME/Library/Android/sdk"
+  export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+  ```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+* **Manifest não aplicado / permissões não entram**
+  Garanta que editou `android/app/src/main/AndroidManifest.xml` (não só `debug`) e reinstale:
 
-## Step 3: Modify your app
+  ```bash
+  npm run android:reinstall
+  ```
 
-Now that you have successfully run the app, let's make changes!
+* **Biometria `available: false` no Android**
+  Cadastre uma digital no AVD (passo de “Touch sensor”) e faça **Cold Boot** se necessário.
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+* **iOS: `cannot find type 'RCTPromiseResolveBlock' in scope`**
+  Falta `import React` no Swift **ou** os arquivos não estão no **target** do app no Xcode.
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+* **Limpar dados/“keychain” no Android**
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+  ```bash
+  adb uninstall com.bankwalletapp
+  ```
 
-## Congratulations! :tada:
+  (remove também as chaves do Keystore do app)
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
