@@ -1,4 +1,7 @@
 {
+    "user": {
+        "name": "Ana Prado"
+    },
     "balance": {
         "balance": 2500.50,
         "currency": "R$"
