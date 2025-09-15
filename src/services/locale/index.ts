@@ -1,7 +1,12 @@
 import { NativeModules } from 'react-native';
 
-const { LocaleModule } = NativeModules;
+type LocaleModuleType = { getSystemLocale(): Promise<string> };
+const { LocaleModule } = NativeModules as { LocaleModule: LocaleModuleType };
 
 export async function getDeviceLocale(): Promise<string> {
-  return 'en-US';
+  try {
+    return await LocaleModule.getSystemLocale(); // "pt-BR", "en-US", etc.
+  } catch {
+    return 'en-US';
+  }
 }
