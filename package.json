@@ -3,17 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "start": "react-native start --reset-cache ",
     "android": "react-native run-android",
     "android:clean": "cd android && ./gradlew clean",
     "android:reinstall": "adb uninstall com.bankwalletapp || true && cd android && ./gradlew clean && cd .. && npx react-native run-android",
     "ios": "react-native run-ios",
-    "ios:simulator": "react-native run-ios --simulator='iPhone 16 Pro'",
-    "lint": "eslint .",
-    "start": "react-native start --reset-cache ",
-    "test": "jest",
-    "mock": "json-server --watch db.json --port 3000",
-    "ios:pods": "npx pod-install ios",
-    "ios:run": "npx react-native run-ios"
+    "ios:pods": "cd ios && pod install && cd ..",
+    "ios:run": "react-native run-ios --simulator='iPhone 16 Pro'",
+    "mock": "json-server --watch db.json --port 3000"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",

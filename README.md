@@ -1,80 +1,113 @@
 # BankWalletApp
 
-Aplicativo **React Native** com autenticação por **biometria (fingerprint/Face ID)**, **PIN**, e módulo nativo para obter o **idioma do sistema** (Android/iOS).
+React Native application with authentication via **biometrics (fingerprint/Face ID)**, **PIN**, and a native module to get the **system language** (Android/iOS).
 
 ---
 
-## Stack
+## Tech Stack
 
 * **React Native**
 * **TypeScript**
 * **React Navigation**
-* **Biometria**: `react-native-biometrics` (ou equivalente)
-* **Módulos nativos**:
+* **Biometrics**: `react-native-biometrics` (or equivalent)
+* **Native Modules**:
 
   * Android: `LocaleModule.kt` (Kotlin)
   * iOS: `LocaleModule.swift` + bridge `.m`
 
 ---
 
-## Pré-requisitos
+## Scripts (package.json)
 
-* **Node** LTS e **npm**/**yarn**
+```json
+{
+  "scripts": {
+    "start": "react-native start --reset-cache ",
+    "android": "react-native run-android",
+    "android:clean": "cd android && ./gradlew clean",
+    "android:reinstall": "adb uninstall com.bankwalletapp || true && cd android && ./gradlew clean && cd .. && npx react-native run-android",
+    "ios": "react-native run-ios",
+    "ios:pods": "cd ios && pod install && cd ..",
+    "ios:run": "react-native run-ios --simulator='iPhone 16 Pro'",
+    "mock": "json-server --watch db.json --port 3000"
+  }
+}
+```
+
+---
+
+## Prerequisites
+
+* **Node** LTS and **npm**/**yarn**
 * **Java 17** (JDK 17)
-* **Android Studio** (SDK + Emulador)
+* **Android Studio** (SDK + Emulator)
 * **Xcode** (13+), CocoaPods (`gem install cocoapods`)
 
 ---
 
-## Configuração do ambiente
+## Environment Setup (Step by Step)
 
-### ANDROID
+### 1) Install basic tools
 
-Configure as variáveis (ajuste o caminho conforme seu SO):
+1. Install **Node LTS** and **npm**/**yarn**.
+2. Install **Java 17 (JDK 17)**.
+3. Install **Android Studio** with **SDK**, **Platform-Tools** and **Emulator**.
+4. On macOS, install **Xcode** (13+) and **CocoaPods**: `sudo gem install cocoapods`.
 
-**macOS**
+### 2) Configure Android (macOS)
 
-```bash
-export ANDROID_HOME="$HOME/Library/Android/sdk"
-export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
-```
+1. Export environment variables (adjust the path for your user):
 
-Crie/edite `android/local.properties` se necessário:
+   ```bash
+   export ANDROID_HOME="$HOME/Library/Android/sdk"
+   export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+   ```
+2. Check that `adb` is available: `which adb`.
+3. Create/edit `android/local.properties`:
 
-```
-sdk.dir=/Users/<seu-usuario>/Library/Android/sdk
-```
+   ```
+   sdk.dir=/Users/<your-username>/Library/Android/sdk
+   ```
+4. Open **Android Studio**, download a **System Image** (e.g., Pixel / Android 14) and create an **AVD**.
 
-### iOS
+### 3) Configure iOS (macOS)
 
-Instale as dependências nativas:
+1. From the project root, install native dependencies:
 
-```bash
-npx pod-install ios
-```
+   ```bash
+   npx pod-install ios
+   ```
+2. Confirm that `ios/BankWalletApp.xcworkspace` opens in Xcode without errors.
+
+### 4) Quick verification
+
+* Run `node -v`, `java -version`, `adb --version`.
+* Start an AVD in Android Studio.
+* Start iOS Simulator in Xcode.
 
 ---
 
-## Instalação
+## Project Dependencies
 
 ```bash
-npm i
-# ou
+npm install
+# or
 yarn
 ```
+
 ---
 
-## Executando
+## Running the App
 
 ### Android
 
-1. Inicie um dispositivo (AVD) no Android Studio.
-2. Em um terminal:
+1. Start an AVD in Android Studio.
+2. In one terminal, start Metro:
 
    ```bash
-   npx react-native start --reset-cache
+   npm run start
    ```
-3. Em outro terminal:
+3. In another terminal, reinstall and run:
 
    ```bash
    npm run android:reinstall
@@ -82,70 +115,109 @@ yarn
 
 ### iOS
 
-1. Inicie o Metro (se não estiver rodando).
-2. Rode:
+1. Start Metro if not running.
+2. Run:
 
    ```bash
    npm run ios:pods
    npm run ios:run
    ```
 
-   > Se preferir, abra `ios/BankWalletApp.xcworkspace` no Xcode e rode (⌘R).
+   > Alternatively, open `ios/BankWalletApp.xcworkspace` in Xcode and run (⌘R).
 
 ---
 
-## Biometria
+## Mock API
 
-### Android (emulador)
+For offline development, you can run a fake API with **json-server**.
 
-* **Permissões** no `AndroidManifest.xml`:
+### Setup
+
+1. Install as a dev dependency:
+
+   ```bash
+   npm i -D json-server
+   ```
+2. In the **project root**, create `db.json` (or reuse your existing one). Example:
+
+   ```json
+   {
+     "balance": { "amount": 1520.34, "currency": "BRL" },
+     "transactions": [
+       { "id": "tx_1", "type": "debit", "title": "Groceries", "amount": 89.90, "date": "2025-09-13" },
+       { "id": "tx_2", "type": "credit", "title": "Salary", "amount": 5800.00, "date": "2025-09-10" }
+     ]
+   }
+   ```
+3. The script `mock` is already defined in `package.json`:
+
+   ```json
+   { "mock": "json-server --watch db.json --port 3000" }
+   ```
+
+### Run mock server
+
+```bash
+npm run mock
+```
+
+* iOS Simulator: `http://localhost:3000`
+* Android Emulator: `http://10.0.2.2:3000`
+* Real devices: use your machine’s IP (e.g., `http://192.168.0.10:3000`).
+
+> Tip: use an `.env` variable (e.g., `API_BASE_URL`) and switch depending on platform.
+
+---
+
+## Biometrics
+
+### Android (emulator)
+
+* **Permissions** in `AndroidManifest.xml`:
 
   ```xml
   <uses-permission android:name="android.permission.USE_BIOMETRIC" />
   <uses-permission android:name="android.permission.USE_FINGERPRINT" />
   ```
-* **Cadastrar digital no AVD**:
+* **Register fingerprint in AVD**:
 
   1. Settings → **Security & privacy** → **Device unlock**.
-  2. Defina um **PIN**.
-  3. Abra **Pixel Imprint / Fingerprint** → **Add fingerprint**.
-  4. Deixe a tela “Touch the sensor” aberta e use os **três pontinhos → Fingerprint → Touch sensor** várias vezes até concluir.
-* **Testar no app**: chame o prompt biométrico e use **Touch sensor** novamente.
+  2. Set a **PIN**.
+  3. Open **Pixel Imprint / Fingerprint** → **Add fingerprint**.
+  4. Keep the “Touch the sensor” screen open and use **… → Fingerprint → Touch sensor** repeatedly until complete.
+* **Test in app**: trigger biometric prompt and use **Touch sensor** again.
 
-### iOS (simulador/dispositivo)
+### iOS (simulator/device)
 
-* No **simulador**, configure o idioma em *Settings → General → Language & Region*.
-* Para **Face ID**, adicione em `Info.plist`:
+* In Simulator, configure language in *Settings → General → Language & Region*.
+* For **Face ID**, add in `Info.plist`:
 
   ```xml
   <key>NSFaceIDUsageDescription</key>
-  <string>Usamos o Face ID para autenticar você com segurança.</string>
+  <string>We use Face ID for secure authentication.</string>
   ```
 
 ---
 
-## Módulo nativo — Idioma do sistema
+## Native Module — System Language
 
 ### Android
 
-Arquivo principal: `android/app/src/main/java/com/bankwalletapp/locale/LocaleModule.kt`
-Registre o pacote `LocalePackage()` no `MainApplication.kt`.
-
-Retorna a *language tag* do **idioma do sistema** (ex.: `pt-BR`), ignorando “idioma por app”:
-
+* Main file: `android/app/src/main/java/com/bankwalletapp/locale/LocaleModule.kt`
+* Register `LocalePackage()` in `MainApplication.kt`.
+* Returns the **system language tag** (e.g., `pt-BR`, `en-US`), ignoring per-app language overrides.
 
 ### iOS
 
-Arquivos:
+* Files:
 
-* `ios/BankWalletApp/NativeModules/Locale/LocaleModule.swift`
-* `ios/BankWalletApp/NativeModules/Locale/LocaleModule.m`
-
-> **Importante:** adicione os arquivos ao **target** do app no Xcode (File → Add Files… → marque *Add to targets*).
+  * `ios/BankWalletApp/NativeModules/Locale/LocaleModule.swift`
+  * `ios/BankWalletApp/NativeModules/Locale/LocaleModule.m`
+* **Important**: add these files to the **target** in Xcode (File → Add Files → *Add to targets*).
 
 ---
 
-## Estrutura do projeto
+## Project Structure
 
 ```
 /android
@@ -165,7 +237,7 @@ Arquivos:
     TransactionDetailsScreen/
   /services
     /locale
-      index.ts    # wrapper TS do módulo nativo de locale
+      index.ts    # TS wrapper for native locale module
 App.tsx
 index.js
 ```
@@ -175,32 +247,42 @@ index.js
 ## Troubleshooting
 
 * **`spawnSync adb ENOENT`**
-  `adb` não está no `PATH`. Instale **Platform-Tools** e exporte:
+  `adb` not in `PATH`. Install **Platform-Tools** and export:
 
   ```bash
   export ANDROID_HOME="$HOME/Library/Android/sdk"
   export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
   ```
 
-* **Manifest não aplicado / permissões não entram**
-  Garanta que editou `android/app/src/main/AndroidManifest.xml` (não só `debug`) e reinstale:
+* **Manifest changes not applied**
+  Ensure you edited `android/app/src/main/AndroidManifest.xml` (not only `debug`) and reinstall:
 
   ```bash
   npm run android:reinstall
   ```
 
-* **Biometria `available: false` no Android**
-  Cadastre uma digital no AVD (passo de “Touch sensor”) e faça **Cold Boot** se necessário.
+* **Biometrics `available: false` on Android**
+  Register a fingerprint in AVD and perform **Cold Boot** if needed.
 
 * **iOS: `cannot find type 'RCTPromiseResolveBlock' in scope`**
-  Falta `import React` no Swift **ou** os arquivos não estão no **target** do app no Xcode.
+  Missing `import React` in Swift **or** files not added to target in Xcode.
 
-* **Limpar dados/“keychain” no Android**
+* **Clear Android data/“keychain”**
 
   ```bash
   adb uninstall com.bankwalletapp
   ```
 
-  (remove também as chaves do Keystore do app)
+  (also removes app keystore keys)
 
 ---
+
+## Suggested Dev Flow (with mock)
+
+1. Terminal A: `npm run mock` (fake API on `:3000`).
+2. Terminal B: `npm run start` (Metro bundler with cache reset).
+3. Terminal C:
+
+   * Android: `npm run android:reinstall`
+   * iOS: `npm run ios:pods && npm run ios:run`
+4. In the app, test login via **PIN** and **Biometrics**; navigate to **Home** and **TransactionDetails** screens consuming mock endpoints.
