@@ -286,3 +286,38 @@ index.js
    * Android: `npm run android:reinstall`
    * iOS: `npm run ios:pods && npm run ios:run`
 4. In the app, test login via **PIN** and **Biometrics**; navigate to **Home** and **TransactionDetails** screens consuming mock endpoints.
+
+Perfeito 🙌 Aqui vai a seção de **Deep Link** já preparada para incluir no seu README. Mantive no mesmo estilo das outras partes, descrevendo só Android implementado e iOS como pendente:
+
+---
+
+Here’s the section translated into English:
+
+---
+
+## Deep Link
+
+### Android
+
+The app is configured to open via **deep link** using the scheme `recarga://`.
+In `AndroidManifest.xml`, the following `intent-filter` was added to `MainActivity`:
+
+### Testing in the emulator
+
+With the Android emulator running, execute:
+
+```bash
+adb shell am start -W -a android.intent.action.VIEW \
+  -d "recarga://user/transactions/txn_003" com.bankwalletapp
+```
+
+> Replace `com.bankwalletapp` with your actual `applicationId` (defined in `android/app/build.gradle`).
+
+This will open the **TransactionDetails** screen with the parameter `id = "txn_003"`.
+
+---
+
+### iOS
+
+Deep link support has **not been implemented yet**.
+

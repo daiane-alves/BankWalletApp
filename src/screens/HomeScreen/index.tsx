@@ -7,23 +7,20 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, padding: 16, gap: 12 }}>
-      {' '}
-      <Text style={{ fontSize: 18 }}>Olá, {user?.name ?? 'usuário'}</Text>{' '}
+      <Text style={{ fontSize: 18 }}>Olá, {user?.name ?? 'usuário'}</Text>
       <Text style={{ fontSize: 14, color: '#555' }}>
-        {' '}
-        Idioma do aparelho: {locale ?? '...'}{' '}
-      </Text>{' '}
+        Idioma do aparelho: {locale ?? '...'}
+      </Text>
       <Text style={{ fontSize: 22, fontWeight: '700' }}>
-        {' '}
-        Saldo:{' '}
+        Saldo:
         {bal?.balance != null
           ? bal.balance.toLocaleString('pt-BR', {
               style: 'currency',
               currency: 'BRL',
             })
-          : '—'}{' '}
-      </Text>{' '}
-      <Text style={{ marginTop: 8, fontWeight: '600' }}>Transações</Text>{' '}
+          : '—'}
+      </Text>
+      <Text style={{ marginTop: 8, fontWeight: '600' }}>Transações</Text>
       <FlatList
         data={txs ?? []}
         keyExtractor={t => t.id}
@@ -44,24 +41,22 @@ export default function HomeScreen() {
               borderColor: '#eee',
             }}
           >
-            {' '}
             <Text style={{ fontWeight: '600' }}>
               {item.description ?? item.type}
-            </Text>{' '}
+            </Text>
             <Text>
-              {' '}
-              {new Date(item.date).toLocaleString('pt-BR')} •{' '}
-              {item.type === 'debit' ? '-' : '+'}{' '}
+              {new Date(item.date).toLocaleString('pt-BR')} •
+              {item.type === 'debit' ? '-' : '+'}
               {Math.abs(item.amount).toLocaleString('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
-              })}{' '}
-            </Text>{' '}
-            {item.cardLast4 && <Text>Cartão •••• {item.cardLast4}</Text>}{' '}
+              })}
+            </Text>
+            {item.cardLast4 && <Text>Cartão •••• {item.cardLast4}</Text>}
           </TouchableOpacity>
         )}
-      />{' '}
-      <Button title="Bloquear agora" onPress={() => handleClick()} />{' '}
+      />
+      <Button title="Bloquear agora" onPress={() => handleClick()} />
     </View>
   );
 }

@@ -14,9 +14,9 @@ export default function BiometricLoginScreen() {
         gap: 12,
       }}
     >
-      {' '}
-      <ActivityIndicator /> <Text>Autenticando por biometria…</Text>{' '}
-      <Button title="Tentar novamente" onPress={tryBio} />{' '}
+      <ActivityIndicator />
+      <Text>Autenticando por biometria…</Text>
+      <Button title="Tentar novamente" onPress={tryBio} />
     </View>
   );
 }
